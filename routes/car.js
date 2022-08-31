@@ -13,9 +13,15 @@ router.get("/", async (req, res) => {
   if (page == 1 && limit == 0) {
     const cars = await Car.find();
 
+    for (const car of cars) {
+      car.images = await [car.images[0]];
+    }
     res.json({ total: cars.length, cars });
   } else if (page == 1) {
     const cars = await Car.find().limit(limit);
+    for (const car of cars) {
+      car.images = await [car.images[0]];
+    }
 
     res.json({ page, total: limit, cars });
   } else if (page > 1) {
@@ -23,6 +29,9 @@ router.get("/", async (req, res) => {
       .skip((page - 1) * limit)
       .limit(limit);
 
+    for (const car of cars) {
+      car.images = await [car.images[0]];
+    }
     res.json({ page, total: limit, cars });
   }
 });
@@ -37,6 +46,11 @@ router.get("/:carbrand", async (req, res) => {
       cars.push(car);
     }
   });
+
+  for (const car of cars) {
+    car.images = await [car.images[0]];
+    await car.save();
+  }
 
   res.json({
     total: cars.length,
