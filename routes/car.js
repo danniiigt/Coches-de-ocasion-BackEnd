@@ -11,14 +11,14 @@ router.get("/", async (req, res) => {
   const { page = 1, limit = 20 } = req.query;
 
   if (page == 1 && limit == 0) {
-    const cars = await Car.find();
+    const cars = await Car.find().sort({ _id: -1 });
 
     for (const car of cars) {
       car.images = await [car.images[0]];
     }
     res.json({ total: cars.length, cars });
   } else if (page == 1) {
-    const cars = await Car.find().limit(limit);
+    const cars = await Car.find().limit(limit).sort({ _id: -1 });
     for (const car of cars) {
       car.images = await [car.images[0]];
     }
@@ -27,7 +27,8 @@ router.get("/", async (req, res) => {
   } else if (page > 1) {
     const cars = await Car.find()
       .skip((page - 1) * limit)
-      .limit(limit);
+      .limit(limit)
+      .sort({ _id: -1 });
 
     for (const car of cars) {
       car.images = await [car.images[0]];
@@ -39,7 +40,7 @@ router.get("/", async (req, res) => {
 router.get("/:carbrand", async (req, res) => {
   const { carbrand } = req.params;
 
-  const carsDb = await Car.find();
+  const carsDb = await Car.find().sort({ _id: -1 });
   const cars = [];
   await carsDb.forEach((car) => {
     if (car.title.toLowerCase().startsWith(carbrand.toLowerCase())) {
