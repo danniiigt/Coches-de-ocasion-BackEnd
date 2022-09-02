@@ -39,9 +39,9 @@ const CarSchema = new Schema({
   },
 });
 
-// UsuarioSchema.methods.toJSON = function () {
-//   const { __v, password, _id, ...usuario } = this.toObject();
-//   usuario.uid = _id;
-//   return usuario;
-// };
+CarSchema.methods.toJSON = function () {
+  const { __v, _id, ...car } = this.toObject();
+  car.uid = _id;
+  return car;
+};
 module.exports = mongoose.model("Car", CarSchema);

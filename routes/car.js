@@ -37,6 +37,14 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/count", async (req, res) => {
+  const carsCount = await Car.countDocuments();
+
+  res.json({
+    cars: carsCount,
+  });
+});
+
 router.get("/:carbrand", async (req, res) => {
   const { carbrand } = req.params;
 
