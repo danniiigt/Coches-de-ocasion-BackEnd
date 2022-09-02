@@ -47,23 +47,13 @@ router.get("/count", async (req, res) => {
 
 router.get("/:carbrand", async (req, res) => {
   const { carbrand } = req.params;
+  const regex = new RegExp(carbrand, "i");
 
-  const carsDb = await Car.find().sort({ _id: -1 });
-  const cars = [];
-  await carsDb.forEach((car) => {
-    if (car.title.toLowerCase().startsWith(carbrand.toLowerCase())) {
-      cars.push(car);
-    }
-  });
-
-  for (const car of cars) {
-    car.images = await [car.images[0]];
-    await car.save();
-  }
+  const carsDb = await Car.find({ title: regex }).sort({ _id: -1 });
 
   res.json({
-    total: cars.length,
-    cars,
+    total: carsDb.length,
+    carsDb,
   });
 });
 
