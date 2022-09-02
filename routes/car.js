@@ -51,6 +51,10 @@ router.get("/:carbrand", async (req, res) => {
 
   const carsDb = await Car.find({ title: regex }).sort({ _id: -1 });
 
+  for (const car of carsDb) {
+    car.images = await [car.images[0]];
+  }
+
   res.json({
     total: carsDb.length,
     cars: carsDb,
