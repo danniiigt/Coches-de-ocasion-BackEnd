@@ -53,7 +53,7 @@ router.get("/:carbrand", async (req, res) => {
 
   res.json({
     total: carsDb.length,
-    carsDb,
+    cars: carsDb,
   });
 });
 
