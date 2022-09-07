@@ -36,12 +36,23 @@ router.get("/", async (req, res) => {
     .limit(limit)
     .sort({ _id: -1 });
 
+  const documentCount = await Car.find({
+    price: { $gte: priceMin || 0, $lte: priceMax || 10000000 },
+    "carTags.kilometers": { $gte: kmMin || 0, $lte: kmMax || 10000000 },
+    "carTags.year": { $gte: yearMin || 0, $lte: yearMax || 10000000 },
+    title: brandRegex,
+    "carTags.horsePower": { $gte: hpMin || 0, $lte: hpMax || 10000000 },
+  }).countDocuments();
+
+  const maxPages = Math.ceil(documentCount / limit);
+
   for (const car of cars) {
     car.images = await [car.images[0]];
   }
 
   res.json({
     page,
+    maxPages,
     querys: {
       kmMin,
       kmMax,
@@ -71,6 +82,19 @@ router.get("/count", async (req, res) => {
 router.get("/:carbrand", async (req, res) => {
   const { carbrand } = req.params;
   const { page = 1, limit = 15 } = req.query;
+  const {
+    kmMin,
+    kmMax,
+    priceMin,
+    priceMax,
+    yearMin,
+    yearMax,
+    brand,
+    gearBox,
+    hpMin,
+    hpMax,
+    doors,
+  } = req.body;
   const regex = new RegExp(carbrand, "i");
 
   const cars = await Car.find({
@@ -79,13 +103,26 @@ router.get("/:carbrand", async (req, res) => {
     "carTags.year": { $gte: yearMin || 0, $lte: yearMax || 10000000 },
     title: regex,
     "carTags.horsePower": { $gte: hpMin || 0, $lte: hpMax || 10000000 },
-  });
+  })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .sort({ _id: -1 });
+
+  const documentCount = await Car.find({
+    price: { $gte: priceMin || 0, $lte: priceMax || 10000000 },
+    "carTags.kilometers": { $gte: kmMin || 0, $lte: kmMax || 10000000 },
+    "carTags.year": { $gte: yearMin || 0, $lte: yearMax || 10000000 },
+    title: regex,
+    "carTags.horsePower": { $gte: hpMin || 0, $lte: hpMax || 10000000 },
+  }).countDocuments();
+
+  const maxPages = Math.ceil(documentCount / limit);
 
   for (const car of cars) {
     car.images = await [car.images[0]];
   }
 
-  res.json({ page, total: cars.length, cars });
+  res.json({ page, maxPages, total: cars.length, documentCount, cars });
 });
 
 router.delete(
