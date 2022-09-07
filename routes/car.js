@@ -8,33 +8,56 @@ const router = Router();
 const Car = require("../models/car");
 
 router.get("/", async (req, res) => {
-  const { page = 1, limit = 20 } = req.query;
+  const { page = 1, limit = 15 } = req.query;
+  const {
+    kmMin,
+    kmMax,
+    priceMin,
+    priceMax,
+    yearMin,
+    yearMax,
+    brand,
+    gearBox,
+    hpMin,
+    hpMax,
+    doors,
+  } = req.body;
 
-  if (page == 1 && limit == 0) {
-    const cars = await Car.find().sort({ _id: -1 });
+  const brandRegex = new RegExp(brand, "i");
 
-    for (const car of cars) {
-      car.images = await [car.images[0]];
-    }
-    res.json({ total: cars.length, cars });
-  } else if (page == 1) {
-    const cars = await Car.find().limit(limit).sort({ _id: -1 });
-    for (const car of cars) {
-      car.images = await [car.images[0]];
-    }
+  const cars = await Car.find({
+    price: { $gte: priceMin || 0, $lte: priceMax || 10000000 },
+    "carTags.kilometers": { $gte: kmMin || 0, $lte: kmMax || 10000000 },
+    "carTags.year": { $gte: yearMin || 0, $lte: yearMax || 10000000 },
+    title: brandRegex,
+    "carTags.horsePower": { $gte: hpMin || 0, $lte: hpMax || 10000000 },
+  })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .sort({ _id: -1 });
 
-    res.json({ page, total: limit, cars });
-  } else if (page > 1) {
-    const cars = await Car.find()
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .sort({ _id: -1 });
-
-    for (const car of cars) {
-      car.images = await [car.images[0]];
-    }
-    res.json({ page, total: limit, cars });
+  for (const car of cars) {
+    car.images = await [car.images[0]];
   }
+
+  res.json({
+    page,
+    querys: {
+      kmMin,
+      kmMax,
+      priceMin,
+      priceMax,
+      yearMin,
+      yearMax,
+      brand,
+      gearBox,
+      hpMin,
+      hpMax,
+      doors,
+    },
+    total: cars.length,
+    cars,
+  });
 });
 
 router.get("/count", async (req, res) => {
@@ -47,18 +70,22 @@ router.get("/count", async (req, res) => {
 
 router.get("/:carbrand", async (req, res) => {
   const { carbrand } = req.params;
+  const { page = 1, limit = 15 } = req.query;
   const regex = new RegExp(carbrand, "i");
 
-  const carsDb = await Car.find({ title: regex }).sort({ _id: -1 });
+  const cars = await Car.find({
+    price: { $gte: priceMin || 0, $lte: priceMax || 10000000 },
+    "carTags.kilometers": { $gte: kmMin || 0, $lte: kmMax || 10000000 },
+    "carTags.year": { $gte: yearMin || 0, $lte: yearMax || 10000000 },
+    title: regex,
+    "carTags.horsePower": { $gte: hpMin || 0, $lte: hpMax || 10000000 },
+  });
 
-  for (const car of carsDb) {
+  for (const car of cars) {
     car.images = await [car.images[0]];
   }
 
-  res.json({
-    total: carsDb.length,
-    cars: carsDb,
-  });
+  res.json({ page, total: cars.length, cars });
 });
 
 router.delete(
