@@ -8,7 +8,7 @@ const router = Router();
 const Car = require("../models/car");
 
 router.get("/", async (req, res) => {
-  const { page = 1, limit = 15 } = req.query;
+  let { page = 1, limit = 15 } = req.query;
   const {
     kmMin,
     kmMax,
@@ -22,6 +22,9 @@ router.get("/", async (req, res) => {
     hpMax,
     doors,
   } = req.body;
+
+  page = parseInt(page);
+  limit = parseInt(limit);
 
   const brandRegex = new RegExp(brand, "i");
 
@@ -95,6 +98,10 @@ router.get("/:carbrand", async (req, res) => {
     hpMax,
     doors,
   } = req.body;
+
+  page = parseInt(page);
+  limit = parseInt(limit);
+
   const regex = new RegExp(carbrand, "i");
 
   const cars = await Car.find({
