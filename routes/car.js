@@ -84,7 +84,7 @@ router.get("/count", async (req, res) => {
 
 router.get("/:carbrand", async (req, res) => {
   const { carbrand } = req.params;
-  const { page = 1, limit = 15 } = req.query;
+  let { page = 1, limit = 15 } = req.query;
   const {
     kmMin,
     kmMax,
