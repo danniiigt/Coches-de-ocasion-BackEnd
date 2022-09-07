@@ -38,6 +38,7 @@ router.get("/", async (req, res) => {
     .skip((page - 1) * limit)
     .limit(limit)
     .sort({ _id: -1 });
+  // .sort({ price: -1 }); // FILTRANDO POR PRECIOS DE MAS CAROS A MAS BARATOS
 
   const documentCount = await Car.find({
     price: { $gte: priceMin || 0, $lte: priceMax || 10000000 },
@@ -74,6 +75,22 @@ router.get("/", async (req, res) => {
   });
 });
 
+router.get(
+  "/:id",
+  [
+    check("id", "The provided ID is not valid").isMongoId(),
+    check("id").custom((id) => existsCarById(id)),
+    validateFields,
+  ],
+
+  async (req, res) => {
+    const { id } = req.params;
+    const car = await Car.findById(id);
+
+    res.json(car);
+  }
+);
+
 router.get("/count", async (req, res) => {
   const carsCount = await Car.countDocuments();
 
@@ -82,7 +99,7 @@ router.get("/count", async (req, res) => {
   });
 });
 
-router.get("/:carbrand", async (req, res) => {
+router.get("/marca/:carbrand", async (req, res) => {
   const { carbrand } = req.params;
   let { page = 1, limit = 15 } = req.query;
   const {
