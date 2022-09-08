@@ -23,37 +23,38 @@ router.get("/", async (req, res) => {
     doors,
   } = req.body;
 
-  switch (orderBy) {
+  let orderByDB = orderBy;
+  switch (orderByDB) {
     case "recent":
-      orderBy = { _id: -1 };
+      orderByDB = { _id: -1 };
       break;
     case "hp-desc":
-      orderBy = { "carTags.horsePower": -1 };
+      orderByDB = { "carTags.horsePower": -1 };
       break;
     case "hp-asc":
-      orderBy = { "carTags.horsePower": +1 };
+      orderByDB = { "carTags.horsePower": +1 };
       break;
     case "km-desc":
-      orderBy = { "carTags.kilometers": -1 };
+      orderByDB = { "carTags.kilometers": -1 };
       break;
     case "km-asc":
-      orderBy = { "carTags.kilometers": +1 };
+      orderByDB = { "carTags.kilometers": +1 };
       break;
     case "price-desc":
-      orderBy = { price: -1 };
+      orderByDB = { price: -1 };
       break;
     case "price-asc":
-      orderBy = { price: +1 };
+      orderByDB = { price: +1 };
       break;
     case "year-desc":
-      orderBy = { "carTags.year": -1 };
+      orderByDB = { "carTags.year": -1 };
       break;
     case "year-asc":
-      orderBy = { "carTags.year": +1 };
+      orderByDB = { "carTags.year": +1 };
       break;
 
     default:
-      orderBy = { _id: -1 };
+      orderByDB = { _id: -1 };
       break;
   }
 
@@ -71,7 +72,7 @@ router.get("/", async (req, res) => {
   })
     .skip((page - 1) * limit)
     .limit(limit)
-    .sort(orderBy);
+    .sort(orderByDB);
   // .sort({ _id: -1 });
   // .sort({ price: -1 }); // FILTRANDO POR PRECIOS DE MAS CAROS A MAS BARATOS
 
@@ -92,6 +93,7 @@ router.get("/", async (req, res) => {
   res.json({
     page,
     maxPages,
+    orderBy,
     querys: {
       kmMin,
       kmMax,
@@ -151,37 +153,38 @@ router.get("/marca/:carbrand", async (req, res) => {
     doors,
   } = req.body;
 
-  switch (orderBy) {
+  let orderByDB = orderBy;
+  switch (orderByDB) {
     case "recent":
-      orderBy = { _id: -1 };
+      orderByDB = { _id: -1 };
       break;
     case "hp-desc":
-      orderBy = { "carTags.horsePower": -1 };
+      orderByDB = { "carTags.horsePower": -1 };
       break;
     case "hp-asc":
-      orderBy = { "carTags.horsePower": +1 };
+      orderByDB = { "carTags.horsePower": +1 };
       break;
     case "km-desc":
-      orderBy = { "carTags.kilometers": -1 };
+      orderByDB = { "carTags.kilometers": -1 };
       break;
     case "km-asc":
-      orderBy = { "carTags.kilometers": +1 };
+      orderByDB = { "carTags.kilometers": +1 };
       break;
     case "price-desc":
-      orderBy = { price: -1 };
+      orderByDB = { price: -1 };
       break;
     case "price-asc":
-      orderBy = { price: +1 };
+      orderByDB = { price: +1 };
       break;
     case "year-desc":
-      orderBy = { "carTags.year": -1 };
+      orderByDB = { "carTags.year": -1 };
       break;
     case "year-asc":
-      orderBy = { "carTags.year": +1 };
+      orderByDB = { "carTags.year": +1 };
       break;
 
     default:
-      orderBy = { _id: -1 };
+      orderByDB = { _id: -1 };
       break;
   }
 
@@ -199,7 +202,7 @@ router.get("/marca/:carbrand", async (req, res) => {
   })
     .skip((page - 1) * limit)
     .limit(limit)
-    .sort(orderBy);
+    .sort(orderByDB);
 
   const documentCount = await Car.find({
     price: { $gte: priceMin || 0, $lte: priceMax || 10000000 },
@@ -215,7 +218,14 @@ router.get("/marca/:carbrand", async (req, res) => {
     car.images = await [car.images[0]];
   }
 
-  res.json({ page, maxPages, total: cars.length, documentCount, cars });
+  res.json({
+    page,
+    maxPages,
+    orderBy,
+    total: cars.length,
+    documentCount,
+    cars,
+  });
 });
 
 router.delete(
