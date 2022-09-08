@@ -8,7 +8,7 @@ const router = Router();
 const Car = require("../models/car");
 
 router.get("/", async (req, res) => {
-  let { page = 1, limit = 15 } = req.query;
+  let { page = 1, limit = 15, orderBy = "recent" } = req.query;
   const {
     kmMin,
     kmMax,
@@ -22,6 +22,40 @@ router.get("/", async (req, res) => {
     hpMax,
     doors,
   } = req.body;
+
+  switch (orderBy) {
+    case "recent":
+      orderBy = { _id: -1 };
+      break;
+    case "hp-desc":
+      orderBy = { "carTags.horsePower": -1 };
+      break;
+    case "hp-asc":
+      orderBy = { "carTags.horsePower": +1 };
+      break;
+    case "km-desc":
+      orderBy = { "carTags.kilometers": -1 };
+      break;
+    case "km-asc":
+      orderBy = { "carTags.kilometers": +1 };
+      break;
+    case "price-desc":
+      orderBy = { price: -1 };
+      break;
+    case "price-asc":
+      orderBy = { price: +1 };
+      break;
+    case "year-desc":
+      orderBy = { "carTags.year": -1 };
+      break;
+    case "year-asc":
+      orderBy = { "carTags.year": +1 };
+      break;
+
+    default:
+      orderBy = { _id: -1 };
+      break;
+  }
 
   page = parseInt(page);
   limit = parseInt(limit);
@@ -37,7 +71,8 @@ router.get("/", async (req, res) => {
   })
     .skip((page - 1) * limit)
     .limit(limit)
-    .sort({ _id: -1 });
+    .sort(orderBy);
+  // .sort({ _id: -1 });
   // .sort({ price: -1 }); // FILTRANDO POR PRECIOS DE MAS CAROS A MAS BARATOS
 
   const documentCount = await Car.find({
@@ -101,7 +136,7 @@ router.get("/count", async (req, res) => {
 
 router.get("/marca/:carbrand", async (req, res) => {
   const { carbrand } = req.params;
-  let { page = 1, limit = 15 } = req.query;
+  let { page = 1, limit = 15, orderBy = "recent" } = req.query;
   const {
     kmMin,
     kmMax,
@@ -115,6 +150,40 @@ router.get("/marca/:carbrand", async (req, res) => {
     hpMax,
     doors,
   } = req.body;
+
+  switch (orderBy) {
+    case "recent":
+      orderBy = { _id: -1 };
+      break;
+    case "hp-desc":
+      orderBy = { "carTags.horsePower": -1 };
+      break;
+    case "hp-asc":
+      orderBy = { "carTags.horsePower": +1 };
+      break;
+    case "km-desc":
+      orderBy = { "carTags.kilometers": -1 };
+      break;
+    case "km-asc":
+      orderBy = { "carTags.kilometers": +1 };
+      break;
+    case "price-desc":
+      orderBy = { price: -1 };
+      break;
+    case "price-asc":
+      orderBy = { price: +1 };
+      break;
+    case "year-desc":
+      orderBy = { "carTags.year": -1 };
+      break;
+    case "year-asc":
+      orderBy = { "carTags.year": +1 };
+      break;
+
+    default:
+      orderBy = { _id: -1 };
+      break;
+  }
 
   page = parseInt(page);
   limit = parseInt(limit);
@@ -130,7 +199,7 @@ router.get("/marca/:carbrand", async (req, res) => {
   })
     .skip((page - 1) * limit)
     .limit(limit)
-    .sort({ _id: -1 });
+    .sort(orderBy);
 
   const documentCount = await Car.find({
     price: { $gte: priceMin || 0, $lte: priceMax || 10000000 },
