@@ -7,7 +7,7 @@ const { isAdminRole } = require("../middlewares/validate-role");
 const router = Router();
 const Car = require("../models/car");
 
-router.get("/", async (req, res) => {
+router.post("/", async (req, res) => {
   let { page = 1, limit = 15, orderBy = "recent" } = req.query;
   const {
     kmMin,
@@ -136,7 +136,7 @@ router.get("/count", async (req, res) => {
   });
 });
 
-router.get("/marca/:carbrand", async (req, res) => {
+router.post("/marca/:carbrand", async (req, res) => {
   const { carbrand } = req.params;
   let { page = 1, limit = 15, orderBy = "recent" } = req.query;
   const {
