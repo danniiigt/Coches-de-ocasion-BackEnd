@@ -10,7 +10,7 @@ const Brand = require("../models/brand");
 
 router.post("/", async (req, res) => {
   let { page = 1, limit = 15, orderBy = "recent" } = req.query;
-  const {
+  let {
     kmMin,
     kmMax,
     priceMin,
@@ -70,6 +70,10 @@ router.post("/", async (req, res) => {
   for (const brand of brandsDb) {
     const { name } = brand;
     totalBrands.push(name);
+  }
+
+  if (brands.length <= 0) {
+    brands = null;
   }
 
   const cars = await Car.find({
