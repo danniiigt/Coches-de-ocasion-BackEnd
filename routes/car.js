@@ -6,6 +6,7 @@ const { validateJWT } = require("../middlewares/validate-jwt");
 const { isAdminRole } = require("../middlewares/validate-role");
 const router = Router();
 const Car = require("../models/car");
+const Brand = require("../models/brand");
 
 router.post("/", async (req, res) => {
   let { page = 1, limit = 15, orderBy = "recent" } = req.query;
@@ -21,6 +22,7 @@ router.post("/", async (req, res) => {
     hpMin,
     hpMax,
     doors,
+    brands,
   } = req.body;
 
   let orderByDB = orderBy;
@@ -62,26 +64,33 @@ router.post("/", async (req, res) => {
   limit = parseInt(limit);
 
   const brandRegex = new RegExp(brand, "i");
+  const brandsDb = await Brand.find().sort("name").select("name -_id");
+  let totalBrands = [];
+
+  for (const brand of brandsDb) {
+    const { name } = brand;
+    totalBrands.push(name);
+  }
 
   const cars = await Car.find({
     price: { $gte: priceMin || 0, $lte: priceMax || 10000000 },
     "carTags.kilometers": { $gte: kmMin || 0, $lte: kmMax || 10000000 },
     "carTags.year": { $gte: yearMin || 0, $lte: yearMax || 10000000 },
-    title: brandRegex,
     "carTags.horsePower": { $gte: hpMin || 0, $lte: hpMax || 10000000 },
+    marca: { $in: brands || totalBrands },
+    // title: brandRegex,
   })
     .skip((page - 1) * limit)
     .limit(limit)
     .sort(orderByDB);
-  // .sort({ _id: -1 });
-  // .sort({ price: -1 }); // FILTRANDO POR PRECIOS DE MAS CAROS A MAS BARATOS
 
   const documentCount = await Car.find({
     price: { $gte: priceMin || 0, $lte: priceMax || 10000000 },
     "carTags.kilometers": { $gte: kmMin || 0, $lte: kmMax || 10000000 },
     "carTags.year": { $gte: yearMin || 0, $lte: yearMax || 10000000 },
-    title: brandRegex,
     "carTags.horsePower": { $gte: hpMin || 0, $lte: hpMax || 10000000 },
+    marca: { $in: brands || totalBrands },
+    // title: brandRegex,
   }).countDocuments();
 
   const maxPages = Math.ceil(documentCount / limit);
@@ -106,6 +115,7 @@ router.post("/", async (req, res) => {
       hpMin,
       hpMax,
       doors,
+      brands,
     },
     total: cars.length,
     cars,
