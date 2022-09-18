@@ -22,7 +22,8 @@ router.post("/", async (req, res) => {
     hpMin,
     hpMax,
     doors,
-    brands,
+    brands = [],
+    search = "",
   } = req.body;
 
   let orderByDB = orderBy;
@@ -62,8 +63,8 @@ router.post("/", async (req, res) => {
 
   page = parseInt(page);
   limit = parseInt(limit);
-
-  const brandRegex = new RegExp(brand, "i");
+  
+  const searchRegex = new RegExp(search, "i");
   const brandsDb = await Brand.find().sort("name").select("name -_id");
   let totalBrands = [];
 
@@ -82,7 +83,7 @@ router.post("/", async (req, res) => {
     "carTags.year": { $gte: yearMin || 0, $lte: yearMax || 10000000 },
     "carTags.horsePower": { $gte: hpMin || 0, $lte: hpMax || 10000000 },
     marca: { $in: brands || totalBrands },
-    // title: brandRegex,
+    title: searchRegex
   })
     .skip((page - 1) * limit)
     .limit(limit)
@@ -94,7 +95,7 @@ router.post("/", async (req, res) => {
     "carTags.year": { $gte: yearMin || 0, $lte: yearMax || 10000000 },
     "carTags.horsePower": { $gte: hpMin || 0, $lte: hpMax || 10000000 },
     marca: { $in: brands || totalBrands },
-    // title: brandRegex,
+    title: searchRegex
   }).countDocuments();
 
   const maxPages = Math.ceil(documentCount / limit);
@@ -107,6 +108,7 @@ router.post("/", async (req, res) => {
     page,
     maxPages,
     orderBy,
+    searchRegex,
     querys: {
       kmMin,
       kmMax,
@@ -120,6 +122,7 @@ router.post("/", async (req, res) => {
       hpMax,
       doors,
       brands,
+      search,
     },
     total: cars.length,
     cars,
@@ -165,6 +168,7 @@ router.post("/marca/:carbrand", async (req, res) => {
     hpMin,
     hpMax,
     doors,
+    search = "",
   } = req.body;
 
   let orderByDB = orderBy;
@@ -205,14 +209,14 @@ router.post("/marca/:carbrand", async (req, res) => {
   page = parseInt(page);
   limit = parseInt(limit);
 
-  const regex = new RegExp(carbrand, "i");
+  const searchRegex = new RegExp(search, "i");
 
   const cars = await Car.find({
     price: { $gte: priceMin || 0, $lte: priceMax || 10000000 },
     "carTags.kilometers": { $gte: kmMin || 0, $lte: kmMax || 10000000 },
     "carTags.year": { $gte: yearMin || 0, $lte: yearMax || 10000000 },
-    title: regex,
     "carTags.horsePower": { $gte: hpMin || 0, $lte: hpMax || 10000000 },
+    title: searchRegex,
   })
     .skip((page - 1) * limit)
     .limit(limit)
@@ -222,8 +226,8 @@ router.post("/marca/:carbrand", async (req, res) => {
     price: { $gte: priceMin || 0, $lte: priceMax || 10000000 },
     "carTags.kilometers": { $gte: kmMin || 0, $lte: kmMax || 10000000 },
     "carTags.year": { $gte: yearMin || 0, $lte: yearMax || 10000000 },
-    title: regex,
     "carTags.horsePower": { $gte: hpMin || 0, $lte: hpMax || 10000000 },
+    title: searchRegex,
   }).countDocuments();
 
   const maxPages = Math.ceil(documentCount / limit);
@@ -253,6 +257,7 @@ router.delete(
   ],
   async (req, res) => {
     const { id } = req.params;
+    
 
     const carDeleted = await Car.findById(id);
 
