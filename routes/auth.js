@@ -5,6 +5,11 @@ const bcrypt = require("bcrypt");
 const { generateJWT } = require("../helpers/generate-jwt");
 const { validateFields } = require("../middlewares/validate-fields");
 const { check } = require("express-validator");
+const { validarLoginJWT } = require("../middlewares/validate-jwt");
+
+router.get("/", async (req, res) => {
+  validarLoginJWT(req, res);
+});
 
 router.post(
   "/login",

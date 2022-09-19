@@ -9,7 +9,7 @@ const generateJWT = async (user) => {
       { uid },
       process.env.SECRET_KEY_JWT,
       {
-        expiresIn: "1d",
+        expiresIn: "5d",
       },
       (err, token) => {
         if (err) {
