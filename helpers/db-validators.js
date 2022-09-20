@@ -43,10 +43,12 @@ const isEmailTaken = async (email = "") => {
 };
 
 const isUserNameTaken = async (userName = "") => {
-  const userNameExists = await User.findOne({ userName });
+  if (userName !== "") {
+    const userNameExists = await User.findOne({ userName });
 
-  if (userNameExists) {
-    throw new Error("The username is already taken");
+    if (userNameExists) {
+      throw new Error("The username is already taken");
+    }
   }
 };
 

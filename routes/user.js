@@ -13,6 +13,7 @@ const { isAdminRole } = require("../middlewares/validate-role");
 const router = Router();
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
+const { generateJWT } = require("../helpers/generate-jwt");
 
 router.get("/", async (req, res) => {
   const { limit = 10, start = 0 } = req.query;
@@ -56,7 +57,6 @@ router.post(
     check("userName").custom((userName) => isUserNameTaken(userName)),
     check("role").custom((role) => isValidRole(role)),
     check("email").custom((email) => isEmailTaken(email)),
-    check("phone", "The phone must have 9 digits").isLength({ min: 9, max: 9 }),
     validateFields,
   ],
   async (req, res) => {
@@ -80,9 +80,11 @@ router.post(
       });
 
       await user.save();
+      const token = await generateJWT(user);
 
       res.json({
         user,
+        token,
       });
     } catch (error) {
       res.json({

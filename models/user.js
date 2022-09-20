@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const { Schema, model } = require("mongoose");
 
 const UsuarioSchema = new Schema({
+  //SHOW REQUIREDS FIRST
   firstName: {
     type: String,
     required: [true, "El nombre es obligatorio"],
@@ -12,8 +13,7 @@ const UsuarioSchema = new Schema({
   },
   userName: {
     type: String,
-    required: [true, "El nombre es obligatorio"],
-    unique: true,
+    unique: false, // CAN CHANGE IT TO TRUE
   },
   companyName: {
     type: String,
@@ -27,13 +27,13 @@ const UsuarioSchema = new Schema({
     type: String,
     required: [true, "La contraseña es obligatoria"],
   },
-  img: {
-    type: String,
-  },
   role: {
     type: String,
     required: true,
     // Roles: BUYER_ROLE, SELLER_ROLE, ADMIN_ROLE, MOD_ROLE
+  },
+  img: {
+    type: String,
   },
   state: {
     type: Boolean,
