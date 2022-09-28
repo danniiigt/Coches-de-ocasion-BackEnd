@@ -24,7 +24,7 @@ const port = process.env.PORT;
   app.use("/api/brands", require("./routes/brand"));
 
   //REFRESH BRANDS
-  saveBrands();
+  // saveBrands(); THIS IS WHAT DELAYS OUR DATABASE CONNECTION
 
   app.listen(port);
   console.clear();
