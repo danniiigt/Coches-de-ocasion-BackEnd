@@ -25,7 +25,8 @@ router.post(
       const user = await Usuario.findOne({ email });
 
       if (!user) {
-        return res.status(400).json({
+        return res.json({
+          field: "email",
           msg: "No user with the introduced email",
         });
       }
@@ -40,6 +41,7 @@ router.post(
 
       if (!validPassword) {
         return res.status(400).json({
+          field: "password",
           msg: "The password introduced is wrong",
         });
       }
